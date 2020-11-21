@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <title>Immatriculation</title>
+  <!-- Using-FontAwsome-->
+  <script src="https://kit.fontawesome.com/c8e4d183c2.js" crossorigin="anonymous"></script>
+  <link href='https://fonts.googleapis.com/css?family=Arvo:700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Raleway:300,100' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">eMat</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/accueil"><i class="fas fa-home"></i> <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/reglementation">Règlementation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cession">Cession</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/duplicata">Duplicata</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/heritage">Héritage</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/tarifs">Tarifs</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Changement
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/changementNom">Changement de nom</a>
+            <a class="dropdown-item" href="/changementAdresse">Changement d'addresse </a>
+            <a class="dropdown-item" href="/changementProprio">Changement de propriétaire </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            connection
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="signup">S'inscrire</a>
+            <a class="dropdown-item" href="login">Se connecter </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/logout">Se déconnecter</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard">  </a>
+        </li>
+      </ul>
+
+      <img src="/image/ImageAgrée_Rectangle_bleu.png" style="background: white;" width="90px" alt="image agréé rectangle bleu blanc rouge">
+
+    </div>
+  </nav>
+
+ 
+  
+<div class="container-fluid">
+  <div class="row">
+    <h1 class="col-sm-12 col-md-6 col-lg-6">
+    CERTIFICAT D'IMMATRICULATION
+  </h1>
+  <p class="col-sm-12.col-md-6 col-lg-6">
+  </p>
+
+  </div>
+</div>
+  
+  <div>
+    <% if(error && error.length>0){ %>
+            <div class="warning-message">
+                <div class="header">
+                    <%= error %>
+  </div>
+  </div>
+  <% } %>
+
+  <% if(success && success.length > 0){ %>
+  <div class="success-message">
+    <div class="header">
+      <%= success%>
+    </div>
+  </div>
+  
+
+  <% } %>
+
+  </header>

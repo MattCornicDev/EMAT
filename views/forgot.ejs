@@ -1,0 +1,24 @@
+<%- include("header"); %> 
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+
+            <h1>Réinitialiser votre mot de passe</h1>
+
+            <form action="/forgot" method="post">
+                <div>
+                    <div class="field">
+                        <i class="user icon"></i>
+                        <input type="text" name="username" class="form-control" placeholder="username" required autocomplete="off">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Réinitialiser</button>
+            </form>
+            <img src="/image/mot-de-passe.jpg" alt="image de mot de passe" width="600px">
+        </div>
+
+    </div>
+</div>
+
+<%- include('footer'); %>

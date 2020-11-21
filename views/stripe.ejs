@@ -1,0 +1,38 @@
+<%- include ('header'); %> 
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+			   <h3>Payer en toute sécurité</h3> 
+        </div>
+		<div class="col-sm-12 col-md-6 col-xl-6">
+			<img src="/image/paiement.webp" alt="logo paiement">
+		</div>
+		<div class="col-sm-12 col-md-6 col-xl-6">
+			<p>Vous pouvez régler votre commande par carte bancaire. 
+				Aucune information bancaire ne transite ni n'est conservée par le site palmares1868.com. Votre commande sera ainsi enregistrée dès l'acceptation du paiement par le service bancaire. Vous pouvez payer en ligne en toute confiance en saisissant le numéro, la date d'expiration de votre carte bancaire et le code de sécurité se trouvant au dos de celle ci dans les champs prévus à cet effet.
+				Depuis votre panier jusqu'à la confirmation de votre paiement, un cadenas dans la barre d'adresse vous indique que la transaction est sécurisée par le protocole « https » et que l'identité du site est validée par un certificat « SSL ».</p>
+		
+    
+	<p>Une fois le paiement effectué vous receverez dans les meilleurs<br> délais le certificat d'immatriculation à l'adresse indiqué</p>
+</div>
+
+	<form action="payment" method="POST"> 
+	<script
+		src="//checkout.stripe.com/v2/checkout.js"
+		class="stripe-button"
+		data-key="<%= key %>" 
+		data-amount="7000" 
+		data-currency="eur" 
+		data-name="eMat" 
+		data-description="Certificat d'immatriculation" 
+		data-locale="auto" > 
+        </script> 
+        </div>
+    
+</div>
+
+ 
+        
+
+<%- include('footer'); %> 

@@ -1,0 +1,101 @@
+<!--
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <h1 style="color:blue">S'inscrire</h1>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <form action="/signup" method="post">
+                <div>
+                        <div>
+                            <input type="text" name="username" class="form-control" placeholder="username" required
+                                autocomplete="off">
+                        </div>
+                        <div>
+                            <input type="password" name="password" class="form-control" placeholder="password" required
+                                autocomplete="off">
+                        </div>
+                    <button type="submit" class="btn" style="margin-top: 15px;">S'inscrire</button>
+                </div>
+                <a href=auth/facebook>S'authentifier avec votre compte Facebook</a>
+                <br></br>
+                <a href=auth/github>S'authentifier avec son compte Github</a>
+            </form>
+        </div>
+
+        <div class="ui message">
+            Déjà utilisateur ? <a href="/login" style="columns: #a2a2a2;text-decoration:none;">Se connecter</a>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+-->
+
+<%- include('header'); %>
+
+<div>
+    <% if(error && error.length>0){ %>
+    <div class="warning-message">
+        <div class="header">
+            <%= error %>
+        </div>
+    </div>
+    <% } %>
+
+    <% if(success && success.length > 0){ %>
+    <div class="success-message">
+        <div class="header">
+            <%= success%>
+        </div>
+    </div>
+
+
+    <% } %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-xl-12">
+                <h1>S'enregister</h1>
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-xl-6">
+                <img src="/image/signin.png" width="300px" alt="photo d'un ordinateur">
+            </div>
+
+            <div class="col-sm-12 col-md-12 col-xl-12">
+                <form action="/signup" method="POST" id="inscription">
+                    <div>
+                        <div class="field">
+                            <div>
+                                <i class="user icon"></i>
+                                <input type="email" class="form-control" placeholder="email" name="username" required
+                                    autocomplete="off" id="email">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div>
+                                <i class="lock icon"></i>
+                                <input type="password" class="form-control" placeholder="password" name="password"
+                                    required autocomplete="off" id="password">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="margin-top:15px;">S'enregistrer</button>
+                    </div>
+                </form>
+            </div>
+            <p style = "color:rgb(255, 255, 255);" id="erreur"></p>
+            <div class="ui message">
+                Déjà Inscrit ? <a href="/login" style="color:#a29bfe;text-decoration:none">Se connecter</a><br>
+                <a href="/forgot" style="color:#a29bfe;text-decoration:none">Mot de passe oublié</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('footer'); %>

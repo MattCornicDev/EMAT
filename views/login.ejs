@@ -1,0 +1,64 @@
+<%- include('header'); %>
+
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-xl-12">
+                
+                <h1>Connection</h1>
+            </div>
+
+            <div class="col-sm-12 col-md-6 col-xl-6">
+                <img src="/image/login.jpg" width="300px" alt="image representant la connection d'un utilisateur">
+            </div>
+            
+
+            <div class="col-sm-12 col-md-6 col-xl-6">
+                <form action="/login" method="POST">
+                    <div>
+                        <div class="field">
+                            <div>
+                                <i class="user icon"></i>
+                                <input type="email" class="form-control" placeholder="email" name="username" required
+                                    autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div>
+                                <i class="lock icon"></i>
+                                <input type="password" class="form-control" placeholder="password" name="password"
+                                    required autocomplete="off">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="margin-top:15px;">Se connecter</button>
+                    </div>
+                </form>
+            </div>
+            <div class="ui message">
+                Nouvel utilisateur ? <a href="/signup" style="color:#a29bfe;text-decoration:none">S'inscrire</a><br>
+                <a href="/forgot" style="color:#a29bfe;text-decoration:none">Mot de passe oublié</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <% if(error && error.length>0){ %>
+    <div class="warning-message">
+        <div class="header">
+            <%= error %>
+        </div>
+    </div>
+    <% } %>
+
+    <% if(success && success.length > 0){ %>
+    <div class="success-message">
+        <div class="header">
+            <%= success%>
+        </div>
+    </div>
+
+
+    <% } %>
+
+<%- include('footer'); %>
