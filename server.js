@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-// const dotenv = require('dotenv').config();
+const dotenv = require('dotenv').config();
 
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
@@ -15,9 +15,9 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 
 // stripe pour les paiements en ligne
-const Publishable_Key = process.env.Publishable_Key;
-const Secret_Key = process.env.Secret_Key;
-const stripe = require('stripe')(Secret_Key);
+const Secret_Key = process.env.SECRET_KEY;
+const Publishable_Key = "process.env.PUBLISHABLE_KEY";
+const stripe = require('stripe')(Secret_Key)
 
 // MODELS
 // const User = require("./models/user");
@@ -35,8 +35,8 @@ app.use(session({
 // passport 
 app.use(passport.initialize());
 app.use(passport.session());
-//mongodb+srv://Certificats_immatriculations:rarib@cluster0.9gpmm.mongodb.net/client?retryWrites=true&w=majority
-mongoose.connect('mongodb+srv://Certificats_immatriculations:rarib@cluster0.9gpmm.mongodb.net/Immat?retryWrites=true&w=majority',
+
+mongoose.connect(process.env.MONGO_DB,
 {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -45,13 +45,6 @@ mongoose.connect('mongodb+srv://Certificats_immatriculations:rarib@cluster0.9gpm
 passport.use(Client.createStrategy());
 passport.serializeUser(Client.serializeUser());
 passport.deserializeUser(Client.deserializeUser());
-
-
-
-// mongoose.connect('mongodb+srv://WebImmat:abdel@cluster0.9gpmm.mongodb.net/visiteur?retryWrites=true&w=majority',{
-//     userNewUrlParser : true,
-//     useUnifiedTopology: true
-// });
 
 // EJS
 app.set('view engine', 'ejs');
@@ -138,7 +131,7 @@ async function main() {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'immatriculation006@gmail.com', // generated ethereal user
-        pass: 'Intrusion', // generated ethereal password
+        pass: process.env.PWD, // generated ethereal password
       },
     });
   
@@ -240,7 +233,7 @@ app.post("/login",(req,res)=>{
                     service: 'gmail',
                     auth: {
                         user: 'immatriculation006@gmail.com',
-                        pass: 'Intrusion'
+                        pass: process.env.PWD
                     }
                 });
                 const mailOptions = {
