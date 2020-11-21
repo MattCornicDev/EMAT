@@ -15,8 +15,8 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 
 // stripe pour les paiements en ligne
-const Publishable_Key = 'pk_test_51Hp7QnGsIt3lDAZ2eeRiiSJhi0UJWUnXnyBuUC3reG0vqQlBakz4ePhJZT4YnnbeJqH8fquQWzdofZPbQxLnjY2P00H4csYcDf';
-const Secret_Key = 'sk_test_51Hp7QnGsIt3lDAZ2zo2bef6ifQXNwUwtkHMnduwN0tMOOFS32Ouo8iDN0Wi57UnER6Jk6DUM9ehDC9Y0ybRhVxTB00rP3bZyTg';
+const Publishable_Key = process.env.Publishable_Key;
+const Secret_Key = process.env.Secret_Key;
 const stripe = require('stripe')(Secret_Key);
 
 // MODELS
