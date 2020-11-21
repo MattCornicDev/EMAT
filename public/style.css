@@ -10,6 +10,7 @@ a{
 
 body{
     font-family: Arial, sans-serif;
+    perspective: 1000px;
 }
 h1{
     text-align: center;
@@ -217,13 +218,21 @@ footer .container .logo:hover{
 
 /*effet 3D */
 
-.card{
+.container .row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container .row .card{
     transform-style: preserve-3d;
     min-height: 80vh;
     width: 35em;
-    margin: 10px 10px 10px 2px;
+    margin: 10px 10px 10px 10px;
+    display: flex;
+    justify-content: center;
     border-radius: 30px;
-    box-shadow: 20px 20px 20px 20px rgba(0, 0, 0, 0.5);
+    /* padding: 0rem 5rem; */
+    box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.5), 0px 0px 50px rgba(0, 0, 0, 0.2);
     background: #e0dcda;
 }
 .sneaker{
@@ -234,7 +243,7 @@ footer .container .logo:hover{
 }
 .sneaker img{
     width: 15rem;
-    z-index: 2;
+    z-index: 2;  /*second plan*/
     transition: all 0.75s ease-out;
 }
 .circle{
@@ -247,7 +256,7 @@ footer .container .logo:hover{
     );
     position: absolute;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 1; /* premier plan */
 }
 .info h1{
     font-size: 2rem;
@@ -267,18 +276,15 @@ footer .container .logo:hover{
 }
 .sizes button{
     padding: 0.5rem 2rem;
-    background: none;
+    background: grey;
     border: none;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     border-radius: 30px;
     cursor: pointer;
     font-weight: bold;
-    color: #585858;
+    color: #111111;
 }
-button .active{
-    background: #f1ecec;
-    color: white;
-}
+
 .purchase{
     margin-top: 5rem;
     transition: all 0.75s ease-out;

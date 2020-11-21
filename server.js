@@ -131,8 +131,8 @@ async function main() {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'immatriculation006@gmail.com', // generated ethereal user
-        pass: process.env.PWD, // generated ethereal password
-      },
+        pass: 'Intrusion', // generated ethereal password
+    },
     });
   
     // send mail with defined transport object
@@ -233,7 +233,7 @@ app.post("/login",(req,res)=>{
                     service: 'gmail',
                     auth: {
                         user: 'immatriculation006@gmail.com',
-                        pass: process.env.PWD
+                        pass: 'Intrusion'
                     }
                 });
                 const mailOptions = {
