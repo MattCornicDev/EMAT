@@ -16,7 +16,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 
 // stripe pour les paiements en ligne
 const Secret_Key = process.env.SECRET_KEY;
-const Publishable_Key = "process.env.PUBLISHABLE_KEY";
+const Publishable_Key = process.env.PUBLISHABLE_KEY;
 const stripe = require('stripe')(Secret_Key)
 
 // MODELS
@@ -26,27 +26,28 @@ const Reset  = require("./models/reset");
 
 mongoose.set('useFindAndModify', false);
 
-//session
+//session initialisation 
 app.use(session({
     secret: "mysecret",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false // ici il dit que si une session n'a jamais été initialisé doit il l'enregister 
 }));
 // passport 
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.session()); // lien entre passport et le plug-in session
 
 mongoose.connect(process.env.MONGO_DB,
 {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-// passport local mongoose
+
+// passport local mongoose Configuration en dessous de mongoose.connect
 passport.use(Client.createStrategy());
 passport.serializeUser(Client.serializeUser());
 passport.deserializeUser(Client.deserializeUser());
 
-// EJS
+// EJS instancié
 app.set('view engine', 'ejs');
 
 // PUBLIC FOLDER
@@ -59,18 +60,15 @@ app.use(bodyParser.urlencoded({extended:false}));
 const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const { replaceOne } = require('./models/client');
-app.use(flash());
+app.use(flash()); // initiatlisation flash 
 
 
-app.use((req,res,next)=>{
-    res.locals.currentUser = req.user;
+app.use((req,res,next)=>{ // on va pouvoir passer des messages d'erreur
+    res.locals.currentUser = req.user; // l'utislisateur courant qui va utiliser notre page 
     res.locals.error = req.flash('error');
-    res.locals.success = req.flash('success');
+    res.locals.success = req.flash('success'); // recuperer les success 
     next();
 });
-
-
-
 
 app.get("/accueil", function (req,res) { 
     res.render('accueil');
@@ -131,7 +129,7 @@ async function main() {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'immatriculation006@gmail.com', // generated ethereal user
-        pass: 'Intrusion', // generated ethereal password
+        pass: process.env.PWD // generated ethereal password
     },
     });
   
@@ -169,14 +167,14 @@ app.get("/signup", function (req,res) {
 });
 app.post("/signup", function(req,res){
     const newClient = new Client({
-        username: req.body.username,
+        username: req.body.username, // je recupere le username
     });
-    Client.register(newClient, req.body.password,(err,user)=>{
+    Client.register(newClient, req.body.password,(err,user)=>{  // j'enregiste mon utilisateur dans ma collection qui hashe et salt mon password
         if(err){
             console.log(err);
             return res.render("signup");
         }else{
-            passport.authenticate("local")(req,res,()=>{
+            passport.authenticate("local")(req,res,()=>{ // cette method va me permettre d'authentifier mon utilisateur en strategy local
                 res.render("login");
             });
         }
@@ -188,28 +186,28 @@ app.get("/login",function(req,res){
     res.render("login");
 });
 app.post("/login",(req,res)=>{
-   const client = new Client({
-       username : req.body.username,
+   const client = new Client({ //je crée un nouvelle utilisateur 
+       username : req.body.username, // on récupére 
        password : req.body.password
    });
-   req.login(client,(err)=>{
+   req.login(client,(err)=>{ // method req.login je connect mon client 
        if(err){
            console.log(err);
        }else{
-           passport.authenticate("local")(req,res,()=>{
-               req.flash('success',"connection succès !");
+           passport.authenticate("local")(req,res,()=>{ // on l'autentifie en stratégy local 
+               req.flash('success',"Vous êtes connecté !"); // envoie du message flash
             res.redirect("/dashboard");
            })
        }
    })
     });
-    app.get('/dashboard',isLoggedIn,(req,res)=>{
+    app.get('/dashboard',isLoggedIn,(req,res)=>{ // is loggin va render le dashbord que si je suis connecté 
         console.log(req.user);
         res.render('dashboard');
     });
 
     app.get("/logout",(req,res)=>{
-        req.logout();
+        req.logout(); // pour deconnecter l'utilisateur 
         req.flash('success',"Merci pour votre visite vous êtes desormais déconnecté");
         res.render("login");
     });
@@ -218,33 +216,33 @@ app.post("/login",(req,res)=>{
         res.render("forgot");
     });
     app.post("/forgot",(req,res)=>{
-        Client.findOne({username: req.body.username},(err,userFound)=>{
+        Client.findOne({username: req.body.username},(err,userFound)=>{ // je vérifie si l'utilisateur existe dans la collection avec findOne
             if(err){
                 console.log(err);
-                res.redirect("login"); //("/login");
+                res.redirect("login"); 
             }else{
-                const token = randToken.generate(16);
-                Reset.create({
-                    username : userFound.username,
+                const token = randToken.generate(16); // je lui créé un token nbre aléatoire de 16 caractère
+                Reset.create({          // insere dans la nouvelle table
+                    username : userFound.username, 
                     resetPasswordToken : token,
-                    resetPasswordExpires: Date.now() + 3600000
+                    resetPasswordExpires: Date.now() + 3600000 // fonction qui me renvoie la date actuelle plus un int en milliseconde
                 });
-                const transporter = nodemailer.createTransport({
+                const transporter = nodemailer.createTransport({  // le transporter va livrer mon mail 
                     service: 'gmail',
-                    auth: {
+                    auth: {                     // mot de passe à partir duquel j'envoie le mail
                         user: 'immatriculation006@gmail.com',
-                        pass: 'Intrusion'
+                        pass: process.env.PWD
                     }
                 });
-                const mailOptions = {
+                const mailOptions = {  // les options du mail
                     from : 'immatriculation006@gmail.com',
-                    to: req.body.username,
-                    subject: 'link to rest your password',
-                    text: 'click sur ce lien pour réinitialisé ton password: http://localhost:3000/reset/' + token
+                    to: req.body.username, // vers qui on l'envoi
+                    subject: 'lien pour réinitialiser le mot de passe',
+                    text: 'Clique sur ce lien pour réinitialisé ton password: http://localhost:3000/reset/' + token
                 }
                 console.log("le mail est pres à être envoyé");
 
-                transporter.sendMail(mailOptions,(err,response)=>{
+                transporter.sendMail(mailOptions,(err,response)=>{ //maintenant que j'ai mis nos options je vais l'envoyer
                     if(err){
                         console.log(err);
                     }else{
@@ -257,9 +255,9 @@ app.post("/login",(req,res)=>{
     });
    
     app.get("/reset/:token",(req,res)=>{
-    Reset.findOne({
-        resetPasswordToken: req.params.token,
-        resetPasswordExpires: {$gt: Date.now()}
+    Reset.findOne({ // je cherche un utilisateur qui à pour token valide
+        resetPasswordToken: req.params.token, 
+        resetPasswordExpires: {$gt: Date.now()} // le token est-il valide ?
     },(err, obj)=>{
         if(err){
             console.log("token expired");
@@ -272,7 +270,7 @@ app.post("/login",(req,res)=>{
         }
     });
     });
-    app.post("/reset/:token", (req,res)=>{
+    app.post("/reset/:token", (req,res)=>{ // je vérifie que le token n'est pas expiré
     Reset.findOne({
         resetPasswordToken: req.params.token,
         resetPasswordExpires: {
@@ -282,24 +280,24 @@ app.post("/login",(req,res)=>{
         if(err){
             console.log("token expired");
             res.redirect("/login");
-        }else{
-            if(req.body.password==req.body.password2){
-                Client.findOne({
-                    username: obj.username
+        }else{  // sinon je test les mots de passe
+            if(req.body.password==req.body.password2){ // name qui sont dans les inputs de reset.ejs
+                Client.findOne({ // je cherche si le client existe 
+                    username: obj.username // je veux recuperer les username qui correspond à mon reset.js
                 },(err,user)=>{
                     if(err){
                         console.log(err);
                     }else{
-                        user.setPassword(req.body.password,(err)=>{
+                        user.setPassword(req.body.password,(err)=>{ // j'actualise le mot de passe 
                             if(err){
                                 console.log(err);
                             }else{
-                                user.save();
-                                const updatedReset = {
+                                user.save(); // j'actualise mon utilisateur dans la nouvelle collection
+                                const updatedReset = { // le token je le remet à null pour ne l'utiliser qu'une fois
                                     resetPasswordToken : null,
                                     resetPasswordExpires : null
                                 }
-                                Reset.findOneAndUpdate({resetPasswordToken:req.params.token},updatedReset,(err,obj1)=>{
+                                Reset.findOneAndUpdate({resetPasswordToken:req.params.token},updatedReset,(err,obj1)=>{ // j'actualiser ma collection reset le deuxieme parametre est l'objet que je veux update
                                     if(err){
                                         console.log(err);
                                     }else{
@@ -320,7 +318,6 @@ app.post("/login",(req,res)=>{
 // Api tarifs carte grise (Obtenir le num SIV du ministère de l'intérieur)
 
 // Fonction de connection
-
 function isLoggedIn(req,res,next){
     if (req.isAuthenticated()) {
         return next();
