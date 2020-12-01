@@ -9,6 +9,8 @@ const randToken = require('rand-token');
 const nodemailer = require("nodemailer");
 
 const https = require('https');
+const fs = require('fs');
+const upload = require('express-fileupload');
 
 const session = require("express-session");
 const passport = require("passport");
@@ -20,11 +22,19 @@ const Publishable_Key = process.env.PUBLISHABLE_KEY;
 const stripe = require('stripe')(Secret_Key)
 
 // MODELS
-// const User = require("./models/user");
+const User = require("./models/user");
 const Client = require("./models/client");
 const Reset  = require("./models/reset");
+const Receipe  = require("./models/receipe");
+const Ingredient  = require("./models/ingredient");
+const Favourite  = require("./models/favourite");
+const Schedule  = require("./models/schedule");
 
 mongoose.set('useFindAndModify', false);
+
+// initialisation de upload
+app.use(upload());
+
 
 //session initialisation 
 app.use(session({
@@ -43,9 +53,9 @@ mongoose.connect(process.env.MONGO_DB,
 });
 
 // passport local mongoose Configuration en dessous de mongoose.connect
-passport.use(Client.createStrategy());
-passport.serializeUser(Client.serializeUser());
-passport.deserializeUser(Client.deserializeUser());
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser()); // permet de gerer les cookies 
+passport.deserializeUser(User.deserializeUser());
 
 // EJS instancié
 app.set('view engine', 'ejs');
@@ -57,10 +67,15 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:false}));
 
 
-const methodOverride = require('method-override');
+const methodOverride = require('method-override'); // m'évite d'utiliser postman et réécrire au dessus de la méthode post
 const flash = require('connect-flash');
-const { replaceOne } = require('./models/client');
+const { replaceOne, findById } = require('./models/client');
+const { errorMonitor } = require('events');
+const ingredient = require('./models/ingredient');
+// const receipe = require('./models/receipe');
+// const ingredient = require('./models/ingredient');
 app.use(flash()); // initiatlisation flash 
+app.use(methodOverride('_method'));
 
 
 app.use((req,res,next)=>{ // on va pouvoir passer des messages d'erreur
@@ -73,15 +88,6 @@ app.use((req,res,next)=>{ // on va pouvoir passer des messages d'erreur
 app.get("/accueil", function (req,res) { 
     res.render('accueil');
 });
-
-/* Ancienne route
-app.get("/tarifs",(req,res)=>{
-    res.render('tarifs');
-});
-app.post("/tarifs",(req,res)=>{
-   
-});
-*/
 app.get("/reglementation", (req,res) =>{
     res.render('reglementation');
 });
@@ -100,12 +106,24 @@ app.get("/changementNom",(req,res)=>{
 app.get("/changementAdresse",(req,res)=>{
     res.render("changementAdresse");
 });
+
 app.get("/heritage",(req,res)=>{
     res.render('heritage');
 });
 app.post("/heritage",(req,res) => {
-    console.log(req.body.carteGriseBarre);
-})
+        if (req.files){
+            var file = req.files.filename,
+            filename = file.name;
+            file.mv("./uploads/" + filename, (err)=>{
+                if(err){
+                    console.log(err);
+                    res.send("Une erreur est survenu");
+                }else{
+                    res.redirect('heritage');
+                }
+            });
+        } 
+});
 
 
 app.get("/info-vehicule",(req,res)=>{
@@ -129,7 +147,7 @@ async function main() {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'immatriculation006@gmail.com', // generated ethereal user
-        pass: process.env.PWD // generated ethereal password
+        pass: "Intrusion" // generated ethereal password
     },
     });
   
@@ -166,10 +184,10 @@ app.get("/signup", function (req,res) {
     res.render("signup");
 });
 app.post("/signup", function(req,res){
-    const newClient = new Client({
+    const newUser = new User({
         username: req.body.username, // je recupere le username
     });
-    Client.register(newClient, req.body.password,(err,user)=>{  // j'enregiste mon utilisateur dans ma collection qui hashe et salt mon password
+    User.register(newUser, req.body.password,(err,user)=>{  // j'enregiste mon utilisateur dans ma collection qui hashe et salt mon password
         if(err){
             console.log(err);
             return res.render("signup");
@@ -186,11 +204,11 @@ app.get("/login",function(req,res){
     res.render("login");
 });
 app.post("/login",(req,res)=>{
-   const client = new Client({ //je crée un nouvelle utilisateur 
+   const user = new User({ //je crée un nouvelle utilisateur 
        username : req.body.username, // on récupére 
        password : req.body.password
    });
-   req.login(client,(err)=>{ // method req.login je connect mon client 
+   req.login(user,(err)=>{ // method req.login je connect mon client 
        if(err){
            console.log(err);
        }else{
@@ -216,7 +234,7 @@ app.post("/login",(req,res)=>{
         res.render("forgot");
     });
     app.post("/forgot",(req,res)=>{
-        Client.findOne({username: req.body.username},(err,userFound)=>{ // je vérifie si l'utilisateur existe dans la collection avec findOne
+        User.findOne({username: req.body.username},(err,userFound)=>{ // je vérifie si l'utilisateur existe dans la collection avec findOne
             if(err){
                 console.log(err);
                 res.redirect("login"); 
@@ -231,7 +249,7 @@ app.post("/login",(req,res)=>{
                     service: 'gmail',
                     auth: {                     // mot de passe à partir duquel j'envoie le mail
                         user: 'immatriculation006@gmail.com',
-                        pass: process.env.PWD
+                        pass: "Intrusion"
                     }
                 });
                 const mailOptions = {  // les options du mail
@@ -282,7 +300,7 @@ app.post("/login",(req,res)=>{
             res.redirect("/login");
         }else{  // sinon je test les mots de passe
             if(req.body.password==req.body.password2){ // name qui sont dans les inputs de reset.ejs
-                Client.findOne({ // je cherche si le client existe 
+                User.findOne({ // je cherche si le client existe 
                     username: obj.username // je veux recuperer les username qui correspond à mon reset.js
                 },(err,user)=>{
                     if(err){
@@ -316,6 +334,231 @@ app.post("/login",(req,res)=>{
 });
 
 // Api tarifs carte grise (Obtenir le num SIV du ministère de l'intérieur)
+
+// Route Receipe
+app.get("/dashboard/myreceipes",isLoggedIn,(req,res)=>{
+    Receipe.find({  // je fais une recherche par id de l'utilisateur
+       user: req.user.id
+    },(err,receipe)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render('receipe',{receipe: receipe}); // on lui passe un objet le deuxieme receipe fait réference à celui du dessus
+    }
+});
+});
+app.get("/dashboard/newreceipe",isLoggedIn,(req,res)=>{
+    res.render("newreceipe");
+});
+app.post("/dashboard/newreceipe",(req,res)=>{
+    const newReceipe = {
+        name: req.body.receipe,
+        image: req.body.logo,
+        user : req.user.id
+    }
+    Receipe.create(newReceipe,(err, newReceipe)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("success","new receipe ajouter");
+            res.redirect("/dashboard/myreceipes");
+        }
+    })
+});
+app.get("/dashboard/myreceipes/:id",function(req,res){  // :id parce que l'id on ne le connait pas
+    Receipe.findOne({user:req.user.id,_id:req.params.id},(err, receipeFound)=>{
+        if(err){
+            console.log(err);
+        }else{
+            Ingredient.find({
+                user: req.user.id,
+                receipe: req.params.id
+            },(err,ingredientFound)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    res.render("ingredients",{
+                        ingredient: ingredientFound,
+                        receipe: receipeFound
+                    });
+                }
+            })
+        }
+    }) // on verifie que l'id correspond à req.params et le user à req.user
+});
+
+app.delete("/dashboard/myreceipes/:id",isLoggedIn,(req,res)=>{
+    Receipe.deleteOne({_id: req.params.id},(err)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash('success','effacé');
+            res.redirect("/dashboard/myreceipes");
+        }
+    });
+});
+
+// Route Ing
+app.get("/dashboard/myreceipes/:id/newingredient",(req,res)=>{
+    Receipe.findById({_id: req.params.id},function(err,found){ // findById, method mongoose qui permet de rechercher que par l'id
+        if(err){
+            console.log(err);
+        }else{
+            res.render("newingredient",{receipe: found});
+        }
+    });
+});
+app.post("/dashboard/myreceipes/:id",(req,res)=>{
+    const newIngredient={
+        name: req.body.name,
+        bestDish: req.body.dish,
+        user: req.user.id,
+        quantity: req.body.quantity,
+        receipe: req.params.id
+    }
+    Ingredient.create(newIngredient,(err,newIngredient)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("success","ajouté !");
+            res.redirect("/dashboard/myreceipes/" + req.params.id);
+        }
+    }) // je passe dans ma table
+});
+
+// Fav Routes
+app.get("/dashboard/favourites",isLoggedIn,(req,res)=>{
+    Favourite.find({user: req.user.id}, (err,favourite)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render("favourites",{favourite: favourite}); // j'ajoute un objet favourite qui contient tous mes objets
+        }
+    });
+});
+app.get("/dashboard/favourites/newfavourite",isLoggedIn,(req,res)=>{
+    res.render('newfavourite');
+});
+app.post("/dashboard/favourites",isLoggedIn,(req,res)=>{
+    const newfavourite={
+        image: req.body.image,
+        title: req.body.title, 
+        description: req.body.description,
+        user: req.user.id,
+    }
+    Favourite.create(newfavourite,(err,newfavourite)=>{
+        if(err){
+            console.log(err)
+        }else{
+            req.flash("success","tu as ajouté à tes favoris");
+            res.redirect("/dashboard/favourites");
+        }
+    });
+});
+app.delete("/dashboard/favourites/:id",isLoggedIn,(req,res)=>{
+    Favourite.deleteOne({_id: req.params.id},(err)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("success","ton favori a été supprimé");
+            res.redirect("/dashboard/favourites");
+        }
+    });
+});
+
+app.delete("/dashboard/myreceipes/:id/:ingredientsid",isLoggedIn,(req,res)=>{
+    Ingredient.deleteOne({_id: req.params.ingredientid},(err)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("success","votre fichier à été supprimé");
+            res.redirect("/dashboard/myreceipes/" + req.params.id);
+        }
+    });
+});
+app.post("/dashboard/myreceipes/:id/:ingredientid/edit",isLoggedIn,(req,res)=>{
+    Receipe.findOne({user:req.user.id,_id:req.params.id},(err, receipeFound)=>{
+        if(err){
+            console.log(err);
+        }else{
+            Ingredient.findOne({
+                _id:req.params.ingredientid,
+                receipe: req.params.id
+            }),(err, ingredientFound)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    res.render("edit",{
+                        ingredient: ingredientFound,
+                        receipe: receipeFound
+                    });
+                }
+            }
+        }
+    })
+});
+app.put("/dashboard/myreceipes/:ingredientid",isLoggedIn,(req,res)=>{
+    const ingredient_updated = 
+    {
+        name: req.body.name,
+        bestDish: req.body.dish, 
+        user: req.user.id,
+        quantity: req.body.quantity,
+        receipe: req.params.id
+    }
+    ingredient.findByIdAndUpdate({_id: req.params.ingredientid},ingredient_updated,(err,updatedIngredient)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("succes","update réalisé avec success");
+            res.redirect("/dahsboard/myreceipes/" + req.params.id);
+        }
+    })
+});
+
+// routes Schedule "programmation"
+app.get("/dashboard/schedule",isLoggedIn,(req,res)=>{
+    Schedule.find({user: req.user.id},(err,schedule)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render("schedule",{schedule: schedule})
+        }
+    })
+});
+app.get("/dashboard/schedule/newSchedule",isLoggedIn,(req,res)=>{
+    res.render("newSchedule");
+});
+app.post("/dashboard/schedule",isLoggedIn,(req,res)=>{
+    const newSchedule = 
+    {
+        ReceipeName: req.body.Receipename,
+        scheduleDate: req.body.scheduledate, 
+        user: req.user.id,
+        time: req.body.time
+    }
+    Schedule.create(newSchedule,(err,newSchedule)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("success","nouvelle programmation");
+            res.redirect("/dashboard/schedule");
+        }
+    })
+});
+app.delete("/dashboard/schedule/:id",isLoggedIn,function(req,res){
+    Schedule.deleteOne({_id: req.params.id},(err)=>{
+        if(err){
+            console.log(err);
+        }else{
+            req.flash("succes","tu as bien éffacé ton programme");
+            res.redirect("/dashboard/schedule");
+        }
+    })
+});
+
+
+
 
 // Fonction de connection
 function isLoggedIn(req,res,next){
@@ -505,6 +748,6 @@ const getAllCustomers = ()=>{
 
 
 app.listen(3000, ()=>{
-    console.log('server is running on port 3000');
+    console.log('server is running on port 5000');
 });
 

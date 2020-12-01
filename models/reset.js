@@ -7,5 +7,5 @@ const resetSchema = new mongoose.Schema({
     resetPasswordExpires: Number
 });
 
-resetSchema.plugin(passportLocalMongoose);
+resetSchema.plugin(passportLocalMongoose); // pour créeer un salt et hasher le token
 module.exports = mongoose.model("Reset",resetSchema);

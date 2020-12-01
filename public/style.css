@@ -28,12 +28,11 @@ ul{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #cbcbcb;
+    background: #d8d8d8;
 }
 .container{
-    background-color: #EBEBED;
+    background-color: #ffffff;
 }
-
 
 .navbar{
     background-color: #03101a;
@@ -74,9 +73,7 @@ ul{
     width: 100px;
     height: 50px;
     line-height: 20px;
-
 }
-
 
 /* footer */
 
@@ -256,7 +253,7 @@ footer .container .logo:hover{
     );
     position: absolute;
     border-radius: 50%;
-    z-index: 1; /* premier plan */
+    z-index: 1; /* permet de mette un élément en premier plan ou second plan */
 }
 .info h1{
     font-size: 2rem;

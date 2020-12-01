@@ -1,0 +1,34 @@
+<%- include('header'); %> 
+<link rel="stylesheet" href="style.css">
+
+
+<div style="text-align:center">
+    <img src="/image/fichier.jpg" alt="photo de fichiers">
+    <h2 style="margin-top:30px;margin-bottom:10px;color:black;font-family:itallic">Fichier </h2>
+    <a href="/dashboard/newreceipe"><button type="button" class="btn btn-success">Ajouter Nouveau fichier</button></a>
+
+
+    <div class="receipe" style="margin-top:50px;">
+        <div>
+            <% receipe.forEach(function(receipe){ %> 
+            <div class="item">
+                <img class="rounded" src="<%= receipe.image %>" style="margin-top:15px;border-radius:30%" width="30%">
+                <div class="content">
+                    <div class="header">
+                        <h3><%= receipe.name %></h3>
+                    </div>
+                </div>
+                <div class="details">
+                    <a href="/dashboard/myreceipes/<%= receipe._id%>"><button type="button" class="btn btn-success" style="margin-bottom:10px;">View Details</button></a>
+                    <form action="/dashboard/myreceipes/<%= receipe._id%>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+
+<%- include('footer'); %> 

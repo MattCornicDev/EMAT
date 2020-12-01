@@ -1,0 +1,22 @@
+<%- include('header'); -%>
+
+
+<div class="new-receipe" style="text-align:center">
+    <div style="margin-top:50px;">
+        <h1 style="font-family:itallic">Nouveau dossier</h1>
+        <p><img src="/image/nouveauDossier.jpg" width="300px" alt="photo d'un dossier"></p>
+        <form method="POST" action="/dashboard/newreceipe" class="ui form">
+            <div class="field">
+                <label>fichier en Photo</label><br>
+                <input type="text" name="logo" placeholder="image" autocomplete="off">
+            </div>
+            <div class="field">
+                <label>Nom</label><br>
+                <input type="text" name="receipe" placeholder="name" autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-success" style="margin-top:15px">Ajouter nouveau fichier</button>
+        </form>
+    </div>
+</div>
+
+<%- include('footer'); %> 
