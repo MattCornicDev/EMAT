@@ -147,7 +147,7 @@ async function main() {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'immatriculation006@gmail.com', // generated ethereal user
-        pass: "Intrusion" // generated ethereal password
+        pass: process.env.PDW // generated ethereal password
     },
     });
   
@@ -180,7 +180,7 @@ async function main() {
 });
 
 // sign In 
-app.get("/signup", function (req,res) {  
+app.get("/signup", (req,res)=> {  
     res.render("signup");
 });
 app.post("/signup", function(req,res){
@@ -249,7 +249,7 @@ app.post("/login",(req,res)=>{
                     service: 'gmail',
                     auth: {                     // mot de passe à partir duquel j'envoie le mail
                         user: 'immatriculation006@gmail.com',
-                        pass: "Intrusion"
+                        pass: process.env.PWD
                     }
                 });
                 const mailOptions = {  // les options du mail
